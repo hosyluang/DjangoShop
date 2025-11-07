@@ -4,23 +4,24 @@
         <!--product-details-->
         <div class="col-sm-5">
             <div class="view-product">
-                <img src="/media/{{ product.images.0 }}" alt="" />
-                <a href="/media/{{ product.images.0 }}" rel="prettyPhoto"><h3>ZOOM</h3></a>
+                <img id="main-image" src="/media/{{ product.images.0 }}" alt="{{ product.name }}" />
+                <a id="zoom-link" href="/media/{{ product.images.0 }}" rel="prettyPhoto">
+                    <h3>ZOOM</h3>
+                </a>
             </div>
+            <!-- Wrapper for slides -->
             <div id="similar-product" class="carousel slide" data-ride="carousel">
-                <!-- Wrapper for slides -->
                 <div class="carousel-inner">
                     <div class="item active">
                         {% for img in product.images %}
-                            <a href=""><img src="/media/{{ img }}" alt="" width="65" height="65" style="object-fit:cover;"/></a>
-                        {% endfor %}
-                        {% comment %} <a href=""><img src="/media/{{ product.images.0 }}" alt="" width="100px"/></a>
-                        <a href=""><img src="/media/{{ product.images.1 }}" alt="" width="100px"/></a>
-                        <a href=""><img src="/media/{{ product.images.2 }}" alt="" width="100px"/></a> {% endcomment %}
+                            <a href="javascript:void(0)" class="thumb">
+                                <img src="/media/{{ img }}" style="width:65px; height:65px;"/>
+                            </a>
+                        {% endfor %} 
                     </div>
                 </div>
                 <!-- Controls -->
-                <a class="left item-control" href="#similar-product" data-slide="prev">
+                <a class="left item-control" href="#similar-product" data-slide="prev" >
                     <i class="fa fa-angle-left"></i>
                 </a>
                 <a class="right item-control" href="#similar-product" data-slide="next">
@@ -31,52 +32,47 @@
         <div class="col-sm-7">
             <div class="product-information">
                 <!--/product-information-->
-                <img src="{% static 'global/images/product-details/new.jpg'%}" class="newarrival" alt="" />
+                {% if product.status == 0 %}
+                    <img src="{% static 'global/images/product-details/new.jpg' %}" class="newarrival" alt="" />
+                {% endif %}
                 <h2>{{ product.name }}</h2>
-                <p>Web ID: {{ product.id }}</p>
-                <img src="{% static 'global/images/product-details/rating.png'%}" alt="" />
-                <span>
+                <p>Product ID: {{ product.id }}</p>
+                <img src="{% static 'global/images/product-details/rating.png' %}" alt="" />
+                <span> 
                     <span>US ${{ product.price }}</span>
                     <label>Quantity:</label>
-                    <input type="text" value="3" /> 
+                    <input type="text" value="3" />
                     <button type="button" class="btn btn-fefault cart">
                         <i class="fa fa-shopping-cart"></i>
                         Add to cart
                     </button>
                 </span>
-                <p>
-                    <b>Availability:</b>
-                    In Stock
-                </p>
-                <p>
-                    <b>Condition:</b>
-                    New
-                </p>
-                <p>
-                    <b>Brand:</b>
-                    {{ product.brand }}
-                </p>
-                <a href="">
-                    <img
-                        src="{% static 'global/images/product-details/share.png'%}"
-                        class="share img-responsive"
-                        alt=""
-                    />
-                </a>
+                <p> <b>Availability:</b> In Stock </p>
+                <p> <b>Condition:</b> New </p> 
+                <p> <b>Brand:</b> {{ product.brand.name }} </p>
+                <a href=""> <img src="{% static 'global/images/product-details/share.png' %}" 
+                    class="share img-responsive" alt="" /></a>
             </div>
             <!--/product-information-->
         </div>
     </div>
     <!--/product-details-->
-
     <div class="category-tab shop-details-tab">
         <!--category-tab-->
         <div class="col-sm-12">
             <ul class="nav nav-tabs">
-                <li><a href="#details" data-toggle="tab">Details</a></li>
-                <li><a href="#companyprofile" data-toggle="tab">Company Profile</a></li>
-                <li><a href="#tag" data-toggle="tab">Tag</a></li>
-                <li class="active"><a href="#reviews" data-toggle="tab">Reviews (5)</a></li>
+                <li>
+                    <a href="#details" data-toggle="tab">Details</a>
+                </li>
+                <li>
+                    <a href="#companyprofile" data-toggle="tab">Company Profile</a>
+                </li>
+                <li>
+                    <a href="#tag" data-toggle="tab">Tag</a>
+                </li>
+                <li class="active">
+                    <a href="#reviews" data-toggle="tab">Reviews (5)</a>
+                </li>
             </ul>
         </div>
         <div class="tab-content">
@@ -142,7 +138,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="tab-pane fade" id="companyprofile">
                 <div class="col-sm-3">
                     <div class="product-image-wrapper">
@@ -205,7 +200,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="tab-pane fade" id="tag">
                 <div class="col-sm-3">
                     <div class="product-image-wrapper">
@@ -268,7 +262,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="tab-pane fade active in" id="reviews">
                 <div class="col-sm-12">
                     <ul>
@@ -297,8 +290,9 @@
                         nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate
                         velit esse cillum dolore eu fugiat nulla pariatur.
                     </p>
-                    <p><b>Write Your Review</b></p>
-
+                    <p>
+                        <b>Write Your Review</b>
+                    </p>
                     <form action="#">
                         <span>
                             <input type="text" placeholder="Your Name" />
@@ -314,11 +308,9 @@
         </div>
     </div>
     <!--/category-tab-->
-
     <div class="recommended_items">
         <!--recommended_items-->
         <h2 class="title text-center">recommended items</h2>
-
         <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
             <div class="carousel-inner">
                 <div class="item active">
@@ -426,4 +418,23 @@
     </div>
     <!--/recommended_items-->
 </div>
-{% endblock%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("a[rel^='prettyPhoto']").prettyPhoto();
+
+        $('.thumb img').on('click', function() {
+            let newSrc = $(this).attr('src');
+            $('#main-image').attr('src', newSrc);
+            $('#zoom-link').attr('href', newSrc);
+        });
+
+        $('.left.item-control').click(function(){
+            $('#similar-product').carousel('prev');
+        });
+        $('.right.item-control').click(function(){
+            $('#similar-product').carousel('next');
+        });
+    });
+</script>
+{% endblock %}
