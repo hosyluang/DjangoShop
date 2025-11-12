@@ -1,84 +1,101 @@
-{% extends "base.html" %} {% load static %} {% block content %}
-<div class="col-sm-3">
-    <div class="left-sidebar">
-        <h2>Account</h2>
-        <div class="panel-group category-products" id="accordian">
-            <!--category-productsr-->
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title"><a href="{% url 'account' %}">account</a></h4>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title"><a href="{% url 'my_product' %}">My product</a></h4>
-                </div>
-            </div>
-        </div>
-        <!--/category-products-->
-    </div>
-</div>
-<div class="col-sm-9">
-    <div class="blog-post-area">
-        <h2 class="title text-center">EDIT PRODUCT</h2>
-        <div class="signup-form">
-            <!--sign up form-->
-            <h2>Edit Product</h2>
-            <form id="productAjax" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="text" name="name" placeholder="Name" value="{{ product.name }}" />
-                <p id="error-name" style="color: red"></p>
-                <input type="number" name="price" placeholder="Price" value="{{ product.price }}" />
-                <p id="error-price" style="color: red"></p>
-                <select name="category">
-                    <option value="" disabled hidden>-- Please choose category --</option>
-                    {% for c in category %}
-                    <option value="{{ c.id }}" {% if c.id="" ="product.category.id" %}selected{% endif %}>
-                        {{ c.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <select name="brand">
-                    <option value="" disabled hidden>-- Please choose brand --</option>
-                    {% for b in brand %}
-                    <option value="{{ b.id }}" {% if b.id="" ="product.brand.id" %}selected{% endif%}>
-                        {{ b.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <!-- Select status -->
-                <select name="status" id="status">
-                    <option value="0" selected>New</option>
-                    <option value="1">Sale</option>
-                </select>
-                <div id="salePrice" style="display: none; margin-top: 8px; width: 50%">
-                    <input type="number" name="sale" placeholder="% giảm giá" />
-                </div>
-                <input type="text" name="company" placeholder="Company" value="{{ product.company }}" />
-                <textarea name="detail" placeholder="Detail">{{ product.detail }}</textarea>
-                <input type="file" name="images" value="{{ product.images }}" multiple />
-                <div class="old-images" style="margin-bottom: 15px">
-                    {% for img in product.images %}
-                    <div class="image-box" style="display: inline-block; text-align: center; margin-right: 10px">
-                        <img
-                            src="/media/{{ img }}"
-                            width="100"
-                            height="100"
-                            style="object-fit: cover; display: block; margin-bottom: 5px"
-                        />
-                        <input type="checkbox" name="hinhxoa[]" value="{{ img }}" class="get-checkbox" />
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="col-sm-3">
+        <div class="left-sidebar">
+            <h2>Account</h2>
+            <div class="panel-group category-products" id="accordian">
+                <!--category-productsr-->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a href="{% url 'account' %}">account</a>
+                        </h4>
                     </div>
-                    {% endfor %}
                 </div>
-                <p id="error-images" style="color: red"></p>
-                <button type="submit" class="btn btn-default">SUBMIT</button>
-            </form>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a href="{% url 'my_product' %}">My product</a>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <!--/category-products-->
         </div>
     </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+    <div class="col-sm-9">
+        <div class="blog-post-area">
+            <h2 class="title text-center">EDIT PRODUCT</h2>
+            <div class="signup-form">
+                <!--sign up form-->
+                <h2>Edit Product</h2>
+                <form id="productAjax" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="text" name="name" placeholder="Name" value="{{ product.name }}" />
+                    <p id="error-name" style="color: red"></p>
+                    <input type="number"
+                           name="price"
+                           placeholder="Price"
+                           value="{{ product.price }}" />
+                    <p id="error-price" style="color: red"></p>
+                    <!-- prettier-ignore-start -->
+                    <select name="category">
+                        <option value="" disabled hidden>-- Please choose category --</option>
+                        {% for c in category %}
+                            <option value="{{ c.id }}"
+                                    {% if c.id == roduct.category.id %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="brand">
+                        <option value="" disabled hidden>-- Please choose brand --</option>
+                        {% for b in brand %}
+                            <option value="{{ b.id }}"
+                                    {% if b.id == product.brand.id %}selected{% endif %}>{{ b.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <!-- prettier-ignore-end -->
+                    <!-- Select status -->
+                    <select name="status" id="status">
+                        <option value="0" selected>New</option>
+                        <option value="1">Sale</option>
+                    </select>
+                    <div id="salePrice" style="display: none; margin-top: 8px; width: 50%">
+                        <input type="number" name="sale" placeholder="% giảm giá" />
+                    </div>
+                    <input type="text"
+                           name="company"
+                           placeholder="Company"
+                           value="{{ product.company }}" />
+                    <textarea name="detail" placeholder="Detail">{{ product.detail }}</textarea>
+                    <input type="file" name="images" value="{{ product.images }}" multiple />
+                    <div class="old-images" style="margin-bottom: 15px">
+                        {% for img in product.images %}
+                            <div class="image-box"
+                                 style="display: inline-block;
+                                        text-align: center;
+                                        margin-right: 10px">
+                                <img src="/media/{{ img }}"
+                                     width="100"
+                                     height="100"
+                                     style="object-fit: cover;
+                                            display: block;
+                                            margin-bottom: 5px" />
+                                <input type="checkbox"
+                                       name="hinhxoa[]"
+                                       value="{{ img }}"
+                                       class="get-checkbox" />
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p id="error-images" style="color: red"></p>
+                    <button type="submit" class="btn btn-default">SUBMIT</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
     $(document).ready(function () {
         $('.get-checkbox').click(function () {
             console.log($(this).val());
@@ -108,5 +125,5 @@
             });
         });
     });
-</script>
+    </script>
 {% endblock %}

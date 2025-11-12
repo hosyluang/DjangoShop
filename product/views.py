@@ -73,7 +73,6 @@ def add_product(request):
             with open(original_path, "wb+") as dest:
                 for chunk in file.chunks():
                     dest.write(chunk)
-
             saved_filenames.append(f"products/{base}{ext}")
             img = Image.open(original_path)
             for size in [100, 200]:
@@ -118,10 +117,12 @@ def edit_product(request, pk):
         company = request.POST.get("company")
         detail = request.POST.get("detail")
         files = request.FILES.getlist("images")
-        remove_file = request.FILES.getlist("hinhxoa[]")
+        hinhcu = product.images or []
+        hinhxoa = request.POST.getlist("hinhxoa[]")
+        hinhconlai = [img for img in hinhcu if img not in hinhxoa]
+
         # validate
         errors = {}
-
         if not name:
             errors["name"] = "Vui long nhap ten san pham"
         if not price:
@@ -134,11 +135,8 @@ def edit_product(request, pk):
             except ValueError:
                 errors["price"] = "Gia khong hop le"
 
-        # xu ly file
-        if not files:
-            errors["images"] = "Phai chon it nhat 1 anh"
-        elif len(files) > 3:
-            errors["images"] = "Toi da 3 file"
+        if len(hinhconlai) + len(files) > 3:
+            errors["images"] = "Tong hinh moi + cu toi da la 3"
         else:
             for file in files:
                 if file.content_type not in ["image/jpeg", "image/png"]:
@@ -150,29 +148,25 @@ def edit_product(request, pk):
         if errors:
             return JsonResponse({"status": "error", "errors": errors}, status=400)
 
-        saved_filenames = product.images or []
+        # Xoa hinh bi checked
+        for img in hinhxoa:
+            img_path = os.path.join(settings.MEDIA_ROOT, img)
+            if os.path.exists(img_path):
+                os.remove(img_path)
 
-        if remove_file == product.images:
-            return
-        if files:
-            save_folder = os.path.join(settings.MEDIA_ROOT, "products")
-            os.makedirs(save_folder, exist_ok=True)
-            saved_filenames = []
-            for file in files:
-                filename = file.name.replace(" ", "_")
-                base, ext = os.path.splitext(filename)
-                ext = ext.lower()
-                original_path = os.path.join(save_folder, f"{base}{ext}")
-                with open(original_path, "wb+") as dest:
-                    for chunk in file.chunks():
-                        dest.write(chunk)
-                saved_filenames.append(f"products/{base}{ext}")
-                img = Image.open(original_path)
-                for size in [100, 200]:
-                    img_copy = img.copy()
-                    img_copy.thumbnail((size, size))
-                    resized_path = os.path.join(save_folder, f"{size}_{base}{ext}")
-                    img_copy.save(resized_path)
+        # Save file
+        save_folder = os.path.join(settings.MEDIA_ROOT, "products")
+        os.makedirs(save_folder, exist_ok=True)
+        new_images = []
+        for file in files:
+            filename = file.name.replace(" ", "_")
+            base, ext = os.path.splitext(filename)
+            ext = ext.lower()
+            file_path = os.path.join(save_folder, f"{base}{ext}")
+            with open(file_path, "wb+") as dest:
+                for chunk in file.chunks():
+                    dest.write(chunk)
+            new_images.append(f"products/{base}{ext}")
 
         product.name = name
         product.price = price
@@ -182,7 +176,7 @@ def edit_product(request, pk):
         product.sale = sale or 0
         product.company = company
         product.detail = detail
-        product.images = saved_filenames
+        product.images = hinhconlai + new_images
         product.save()
 
         return JsonResponse(
