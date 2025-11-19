@@ -182,7 +182,7 @@
                                         <a href="#">Product Details</a>
                                     </li>
                                     <li>
-                                        <a href="#">Checkout</a>
+                                        <a href="{% url 'checkout' %}">Checkout</a>
                                     </li>
                                     <li>
                                         <a href="{% url 'cart' %}">Cart</a>
@@ -236,5 +236,15 @@
                 $(this).addClass('active');
             }
         });
+        function updateCartQuantity() {
+            const cart = {{ request.session.cart|default:'{}'|safe }};
+            let totalQty = 0;
+            $.each(cart, function(key, item) {
+                totalQty += item.qty || 0;
+            });
+            
+            $('.total_qty').text('Cart ' + totalQty);
+        }
+        updateCartQuantity();
     });
 </script>

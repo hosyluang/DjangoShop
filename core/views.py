@@ -27,27 +27,31 @@ def contact(request):
 @login_required
 def add_to_cart(request):
     if request.method == "POST":
-        product_id = request.POST.get("product_id")
+        product_id = str(request.POST.get("product_id"))
         product = Product.objects.get(id=product_id)
-        cart = request.session.get("cart", [])
+        cart = request.session.get("cart", {})
 
-        for item in cart:
-            if item["id"] == product.id:
-                item["qty"] += 1
-                item["total"] = item["qty"] * float(item["price"])
-                break
-        else:
-            total = float(item["price"]) * item["qty"]
-            cart.append(
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "image": product.images[0],
-                    "price": float(product.price),
-                    "qty": 1,
-                    "total": total,
-                }
+        if product_id in cart:
+            cart[product_id]["qty"] += 1
+            cart[product_id]["total"] = cart[product_id]["qty"] * float(
+                cart[product_id]["price"]
             )
+        else:
+            cart[product_id] = {
+                "id": product.id,
+                "name": product.name,
+                "image": product.images[0],
+                "price": float(product.price),
+                "qty": 1,
+                "total": float(product.price),
+            }
         request.session["cart"] = cart
-        return JsonResponse({"status": "success"})
-    return JsonResponse({"status": "error"}, status=400)
+        cart_count = sum(item["qty"] for item in cart.values())
+        return JsonResponse(
+            {
+                "status": "success",
+                "cart": cart,
+                "cart_count": cart_count,
+            }
+        )
+    return JsonResponse({"status": "invalid"}, status=400)

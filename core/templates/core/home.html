@@ -625,6 +625,7 @@
                     success: function(res) {
                         console.log(res)
                         alert("Thanh cong")
+                        $('.total_qty').text("Cart " + res.cart_count)
                     }
                 })
             })

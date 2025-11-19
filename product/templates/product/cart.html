@@ -153,7 +153,7 @@
                             </li>
                         </ul>
                         <a class="btn btn-default update" href="">Update</a>
-                        <a class="btn btn-default check_out" href="">Check Out</a>
+                        <a class="btn btn-default check_out" href="{% url 'checkout' %}">Check Out</a>
                     </div>
                 </div>
             </div>
@@ -163,7 +163,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-
             function updateCart(productID, action, tr) {
                 $.post("{% url 'update_cart' %}", {
                     product_id: productID,

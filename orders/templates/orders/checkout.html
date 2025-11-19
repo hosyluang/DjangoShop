@@ -30,7 +30,7 @@
                     <thead>
                         <tr class="cart_menu">
                             <td class="image">Item</td>
-                            <td class="description"></td>
+                            <td class="description">Name</td>
                             <td class="price">Price</td>
                             <td class="quantity">Quantity</td>
                             <td class="total">Total</td>
@@ -38,51 +38,51 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="cart_product">
-                                <a href="">
-                                    <img src="images/cart/three.png" alt="" />
-                                </a>
-                            </td>
-                            <td class="cart_description">
-                                <h4>
-                                    <a href="">Colorblock Scuba</a>
-                                </h4>
-                                <p>Web ID: 1089772</p>
-                            </td>
-                            <td class="cart_price">
-                                <p>$59</p>
-                            </td>
-                            <td class="cart_quantity">
-                                <div class="cart_quantity_button">
-                                    <a class="cart_quantity_up" href="">+</a>
-                                    <input class="cart_quantity_input"
-                                           type="text"
-                                           name="quantity"
-                                           value="1"
-                                           autocomplete="off"
-                                           size="2" />
-                                    <a class="cart_quantity_down" href="">-</a>
-                                </div>
-                            </td>
-                            <td class="cart_total">
-                                <p class="cart_total_price">$59</p>
-                            </td>
-                            <td class="cart_delete">
-                                <a class="cart_quantity_delete" href=""><i class="fa fa-times"></i></a>
-                            </td>
-                        </tr>
+                        {% for item in carts.values %}
+                            <tr>
+                                <td class="cart_product">
+                                    <a href="{% url 'product_detail' item.id %}">
+                                        <img src="/media/{{ item.image }}" width="150" />
+                                    </a>
+                                </td>
+                                <td class="cart_description">
+                                    <h4>
+                                        <a href="">{{ item.name }}</a>
+                                    </h4>
+                                    <p>Web ID: {{ item.id }}</p>
+                                </td>
+                                <td class="cart_price">
+                                    <p>${{ item.price }}</p>
+                                </td>
+                                <td class="cart_quantity">
+                                    <div class="cart_quantity_button">
+                                        <a class="cart_quantity_up" href="" data-id="{{ item.id }}">+</a>
+                                        <input class="cart_quantity_input"
+                                               type="text"
+                                               name="quantity"
+                                               value="{{ item.qty }}"
+                                               autocomplete="off"
+                                               size="2" />
+                                        <a class="cart_quantity_down" href="" data-id="{{ item.id }}">-</a>
+                                    </div>
+                                </td>
+                                <td class="cart_total">
+                                    <p class="cart_total_price">${{ item.total }}</p>
+                                </td>
+                                <td class="cart_delete">
+                                    <a class="cart_quantity_delete" href="" data-id="{{ item.id }}">
+                                        <i class="fa fa-times"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
                         <tr>
                             <td colspan="4">&nbsp;</td>
                             <td colspan="2">
                                 <table class="table table-condensed total-result">
                                     <tr>
-                                        <td>Total Quantity</td>
-                                        <td>$2</td>
-                                    </tr>
-                                    <tr>
                                         <td>Cart Sub Total</td>
-                                        <td>1</td>
+                                        <td>{{ total_qty }}</td>
                                     </tr>
                                     <tr class="shipping-cost">
                                         <td>Shipping Cost</td>
@@ -91,7 +91,7 @@
                                     <tr>
                                         <td>Total</td>
                                         <td>
-                                            <span>$61</span>
+                                            <span>${{ total_all }}</span>
                                         </td>
                                     </tr>
                                 </table>
@@ -101,7 +101,7 @@
                 </table>
             </div>
             <button type="submit"
-                    class="btn btn-default btn-primary"
+                    class="btn btn-default btn-primary btn-order"
                     style="float: right">MUA</button>
             {% comment %} <div class="payment-options">
                 <span>
@@ -126,4 +126,67 @@
         </div>
     </section>
     <!--/#cart_items-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.btn-order').on('click', function() {
+                $.post("{% url 'send_mail' %}", {
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                }, function(res) {
+                    if (res.status === "success") {
+                        alert("Mua hang thanh cong, Email da gui");
+                        window.location.href = res.redirect_url
+                    } else {
+                        alert("Error: " + res.msg);
+                    }
+                });
+            });
+
+            function updateCart(productID, action, tr) {
+                $.post("{% url 'update_cart' %}", {
+                    product_id: productID,
+                    action: action,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                }, function(res) {
+                    if (res.status === "success") {
+                        tr.find('.cart_quantity_input').val(res.qty)
+                        tr.find('.cart_total_price').text("$" + res.total)
+                        $('.total_all').text("$" + res.total_all)
+                        $('.total_qty').text("Cart " + res.cart_count)
+                    }
+                })
+            }
+            // + 
+            $('.cart_quantity_up').on('click', function(e) {
+                e.preventDefault()
+                const tr = $(this).closest('tr')
+                const id = $(this).data('id')
+                updateCart(id, "up", tr)
+            })
+
+            // - 
+            $('.cart_quantity_down').on('click', function(e) {
+                e.preventDefault()
+                const tr = $(this).closest('tr')
+                const id = $(this).data('id')
+                updateCart(id, "down", tr)
+            })
+
+            // Xóa
+            $('.cart_quantity_delete').on('click', function(e) {
+                e.preventDefault()
+                const tr = $(this).closest('tr')
+                const id = $(this).data('id')
+                $.post("{% url 'delete_cart' %}", {
+                    product_id: id,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                }, function(res) {
+                    alert("Xoa thanh cong")
+                    tr.remove()
+                    $('.total_all').text("$" + res.total_all)
+                    $('.total_qty').text("Cart " + res.cart_count)
+                })
+            })
+        })
+    </script>
 {% endblock %}
