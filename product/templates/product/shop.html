@@ -77,8 +77,8 @@
                                             </div>
                                             <div class="product-overlay">
                                                 <div class="overlay-content">
-                                                    <h2>${{ product.price }}</h2>
-                                                    <p>{{ product.name }}</p>
+                                                    <h2 onclick="window.location.href='{% url 'product_detail' product.id %}';">${{ product.price }}</h2>
+                                                    <p onclick="window.location.href='{% url 'product_detail' product.id %}';">{{ product.name }}</p>
                                                     <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
                                                 </div>
                                             </div>

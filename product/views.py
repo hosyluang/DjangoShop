@@ -209,7 +209,7 @@ def delete_product(request, pk):
 
 @login_required
 def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk, user=request.user)
+    product = get_object_or_404(Product, pk=pk)
     return render(request, "product/product-details.html", {"product": product})
 
 
@@ -314,6 +314,7 @@ def delete_cart(request):
 def search_name(request):
     # Lay tham so tu url
     query = request.GET.get("q", "")
+    results = ""
     if query:
         # name__icontains = WHERE name_product LIKE "%name%"
         results = Product.objects.filter(name__icontains=query)
