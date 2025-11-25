@@ -1,6 +1,6 @@
 # DjangoShop
 
-# 🛒 Django E-commerce Website
+# 🛒 Django E-SHOPPER Website
 
 Website thương mại điện tử được xây dựng bằng Django Framework. Hệ thống bao gồm các chức năng xem sản phẩm, giỏ hàng, đặt hàng và trang quản trị Admin.
 
