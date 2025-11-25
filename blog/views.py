@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django_shop.decorators import non_superuser_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -8,6 +8,7 @@ from django.db.models import Avg
 from .models import Blog, Rate, Comment
 
 
+@non_superuser_required
 def blog_list(request):
     blog_list = Blog.objects.all().order_by("created_at")
     # 3 bai trong 1 page
@@ -20,6 +21,7 @@ def blog_list(request):
     )
 
 
+@non_superuser_required
 def blog_detail(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     next_blog = Blog.objects.filter(id__gt=blog.id).order_by("id").first()
@@ -74,7 +76,7 @@ def blog_rate(request):
 
 
 # @csrf_exempt
-@login_required
+@non_superuser_required
 def blog_cmt(request):
     # if request.method == 'POST':
     #     cmt = request.POST.get('cmt')

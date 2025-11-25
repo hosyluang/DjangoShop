@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django_shop.decorators import non_superuser_required
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
@@ -9,6 +9,7 @@ from django.conf import settings
 # Create your views here.
 
 
+@non_superuser_required
 def checkout(request):
     carts = request.session.get("cart", {})
     total_all = sum(item["qty"] * float(item["price"]) for item in carts.values())
@@ -20,6 +21,7 @@ def checkout(request):
     )
 
 
+@non_superuser_required
 def send_order_email(request):
     if request.method == "POST":
         cart = request.session.get("cart", {})
@@ -62,7 +64,7 @@ def send_order_email(request):
     return JsonResponse({"status": "error", "message": "Invalid request"})
 
 
-@login_required
+@non_superuser_required
 def update_cart(request):
     if request.method == "POST":
         product_id = str(request.POST.get("product_id"))
@@ -101,7 +103,7 @@ def update_cart(request):
     return JsonResponse({"status": "error"})
 
 
-@login_required
+@non_superuser_required
 def delete_cart(request):
     if request.method == "POST":
         product_id = str(request.POST.get("product_id"))

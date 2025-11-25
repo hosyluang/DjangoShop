@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django_shop.decorators import non_superuser_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect
@@ -39,7 +39,7 @@ def custom_logout(request):
     return redirect("login")
 
 
-@login_required
+@non_superuser_required
 def account(request):
     if request.method == "POST":
         form = AccountUpdateForm(request.POST, request.FILES, instance=request.user)
