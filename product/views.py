@@ -3,7 +3,6 @@ from PIL import Image
 from django.conf import settings
 from django.http import JsonResponse
 from .models import Category, Brand, Product
-from django.db.models import Q
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -350,7 +349,7 @@ def search_advanced(request):
         except ValueError:
             pass
     # Phan trang
-    paginator = Paginator(products, 6)
+    paginator = Paginator(products, 9)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     context = {
@@ -365,3 +364,31 @@ def search_advanced(request):
         "search_status": status_query,
     }
     return render(request, "product/shop.html", context)
+
+
+def search_price(request):
+    min_price = request.GET.get("min")
+    max_price = request.GET.get("max")
+
+    if min_price and max_price:
+        products = Product.objects.filter(price__range=(min_price, max_price))
+    else:
+        products = Product.objects.all().order_by("-id")
+
+    data = []
+    for product in products:
+        # Xu ly lay anh dau tien
+        image_url = []
+        if product.images and len(product.images) > 0:
+            image_url = product.images[0]
+
+        data.append(
+            {
+                "id": product.id,
+                "name": product.name,
+                "price": product.price,
+                "image": image_url,
+            }
+        )
+
+    return JsonResponse({"data": data})
